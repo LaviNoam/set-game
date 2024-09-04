@@ -1,0 +1,55 @@
+BONUS CHALLENGE FORM
+--------------------
+
+For each bonus challenge you have implemented, please replace the sentence "We are not entitled to this bonus."
+with a short description of:
+
+1. How it was implemented in your code
+2. Where it was used (in which class methods).
+3. How you tested that it is working correctly.
+
+--------------------
+
+1. Fully supporting all configuration fields and avoiding the use of magic numbers
+
+Instead of using magic numbers we opted to use named constants with a meaningful name. i.e. instead of:Thread.sleep(10);
+ we created a final named powerNap with a value of 10 and Thread.sleep(powerNap);
+Instead of creating variables or creating new fields in each class we opted to use the configuration fields i.e Using
+env.config.deckSize instead of creating a field in Dealer class.
+We tested by changing the config.properties and see if it worked accordingly.
+
+--------------------
+
+2. Terminating all threads (that you created) gracefully and in reverse order to the order they were created in.
+
+main Thread calls terminate func In dealer class, which changes terminate feild to true and traverses in reverse order on players objects calling the player terminate func each time.
+Player terminate func changes terminate feild to true and runs join on each player thread so mainThread will wait for them to finish.
+After all player Threads and dealer thread finish the program will exist.
+
+We tested it with various situations and we checked the logs to make sure that all of the threads terminate in reverse order.
+--------------------
+
+3. Handling the config.turnTimeoutMillis value as follows:
+config.turnTimeoutMillis < 0: display nothing.
+config.turnTimeoutMillis = 0: display a timer since the last action (reshuffle or set collected).
+Note: in modes without a countdown timer the dealer must ensure there is always at least one legal set on the table.
+
+In updateTimerDisplay methods and timerLoop in dealer class we checked turnTimeoutMillis value:
+if it is less than 0:
+InupdateTimerDisplay we do nothing and in timerLoop we shuffle the cards when there is no set in the table.
+if it is equal to 0:
+InupdateTimerDisplay display a timer going up from 0, and whan we reshuffle or collected set timer to 0 again.
+In timerLoop we shuffle the cards when there is no set in the table.
+we tested it by using all modes in game and using the config.properties i.e. when row 1 and Columns 3.
+
+--------------------
+
+4. Making sure that the threads do not wake up unless some actual job needs to be done (e.g., a value needs to be
+changed on the display, key input needs to be handled, etc.) and the only threads created by you are:
+1 thread per player + 1 additional thread for non-human players.
+
+In player class if human, while the action queue is empty we put the player thread in wait and we wake him up when using keypress.
+In dealer class in non timer modes the dealer thread is in wait until player notifies and wakes him up to check his set.
+We didn't add any additional threads.
+The check this we added prints to our program checking when threads go in and out of wait
+We used this in the following methods: sleepUntilWokenOrTimeout(),terminate() and checkQueueSet().
